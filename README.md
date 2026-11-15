@@ -4,6 +4,9 @@ TAICA「生成式 AI：文字與圖像生成的原理與實務」第九週作業
 
 網站採用 React、TypeScript、Vite 和 React Router，使用 pnpm 管理套件。兩種列表支援搜尋、分類與清除篩選，詳細頁由本地 JSON 資料產生。
 
+- [GitHub 儲存庫](https://github.com/Vress0/bianbattle-learning-hub)
+- [公開網站](https://vress0.github.io/bianbattle-learning-hub/)
+
 ## 本機開發
 
 使用 Node.js 22.13 以上與 pnpm 11.9.0。若 Node.js 提供 Corepack，可用 `corepack pnpm` 執行下列 pnpm 命令。
