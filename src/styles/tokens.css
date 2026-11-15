@@ -1,0 +1,30 @@
+:root {
+  color-scheme: dark;
+  --background: #090f20;
+  --surface: #111a30;
+  --surface-raised: #19223d;
+  --border: #2b3652;
+  --control-border: #657495;
+  --text: #f3f5ff;
+  --muted: #b2bed8;
+  --purple: #c8b6ff;
+  --purple-deep: #302457;
+  --cyan: #82eee8;
+  --cyan-deep: #133b49;
+  --ink: #151129;
+  --s1: .5rem;
+  --s2: .75rem;
+  --s3: 1rem;
+  --s4: 1.5rem;
+  --s5: 2rem;
+  --s6: 3rem;
+  --s7: 4.5rem;
+  --rounded: .75rem;
+  --rounded-lg: 1.25rem;
+  --small: .875rem;
+  --body: 1rem;
+  --lead: 1.125rem;
+  --heading: clamp(2rem, 5vw, 3.5rem);
+  --display: clamp(2.35rem, 5.9vw, 4.9rem);
+  font-family: "Inter", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
