@@ -23,6 +23,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm build --base "/${GITHUB_REPOSITORY#*/}/"
+        env:
+          VITE_COACH_ENDPOINT: ${{ vars.VITE_COACH_ENDPOINT }}
       - run: node scripts/prepare-pages.mjs
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,4 @@
+project_id = "bianbattle-learning-hub"
+
+[functions.argument-coach]
+verify_jwt = false

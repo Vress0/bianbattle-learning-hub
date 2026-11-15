@@ -9,7 +9,7 @@ export default function DetailLayout({ item, children }: { item: Article | Topic
   const isArticle = 'sections' in item
 
   return (
-    <article className="detail">
+    <article className={isArticle ? 'detail detail-article' : 'detail detail-topic'}>
       <Link className="back-link" to={isArticle ? '/learn' : '/topics'}>
         ← 返回{isArticle ? '教學列表' : '辯題列表'}
       </Link>
@@ -19,7 +19,7 @@ export default function DetailLayout({ item, children }: { item: Article | Topic
       </div>
       <PageHeading title={item.title} summary={item.summary} />
       <div className="detail-meta">
-        <span>{item.tags.join(' · ')}</span>
+        <span>{item.tags.join('、')}</span>
         <span>更新於 <time dateTime={item.updatedAt}>{item.updatedAt}</time></span>
       </div>
       {children}

@@ -1,15 +1,15 @@
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import DetailLayout from '../components/DetailLayout'
 import TextList from '../components/TextList'
 import { findTopic } from '../lib/content'
 import type { TopicArgument } from '../types/content'
 import NotFound from './NotFound'
 
-function ArgumentGroup({ title, items }: { title: string; items: TopicArgument[] }) {
+function ArgumentGroup({ side, items }: { side: 'pro' | 'con'; items: TopicArgument[] }) {
   return (
-    <section className="panel prose">
-      <h3>{title}</h3>
-      <ul className="arguments">
+    <section className={`panel prose stance stance-${side}`}>
+      <h3>{side === 'pro' ? '正方示範' : '反方示範'}</h3>
+      <ul className="arguments" role="list">
         {items.map((item, index) => (
           <li key={index}>
             <h4>{item.claim}</h4>
@@ -29,6 +29,7 @@ export default function TopicDetail() {
 
   return (
     <DetailLayout item={item}>
+      <Link className="button primary" to={`/practice?topic=${item.slug}`}>使用此辯題開始練習</Link>
       <section className="panel prose">
         <h2>辯題背景</h2>
         {item.background.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
@@ -37,8 +38,8 @@ export default function TopicDetail() {
         <h2>正反方觀點</h2>
         <p>以下觀點供練習與比較。</p>
         <div className="argument-grid">
-          <ArgumentGroup title="正方示範" items={item.proArguments} />
-          <ArgumentGroup title="反方示範" items={item.conArguments} />
+          <ArgumentGroup side="pro" items={item.proArguments} />
+          <ArgumentGroup side="con" items={item.conArguments} />
         </div>
       </section>
       <section className="panel prose">

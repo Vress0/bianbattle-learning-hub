@@ -25,15 +25,15 @@ export default function Catalog({ kind }: CatalogProps) {
   }
 
   return (
-    <>
+    <div className={isLearn ? 'catalog' : 'catalog catalog-topics'}>
       <PageHeading
         title={isLearn ? '辯論教學' : '辯題資料庫'}
         summary={isLearn ? '從讀懂辯題到練習攻防，依照想要加強的技巧挑選文章。' : '比較正反方的示範論點，找出值得深究的爭點。'}
       />
-      <div className="filters">
+      <div className="filters" role="search" aria-label={isLearn ? '教學篩選' : '辯題篩選'}>
         <label>搜尋{isLearn ? '教學' : '辯題'}
-          <input ref={searchInput} type="search" value={query} onChange={(event) => setQuery(event.target.value)}
-            placeholder={isLearn ? '例如：主張、反駁' : '例如：AI、公共空間'} />
+          <span className="search-field"><input ref={searchInput} type="search" value={query} onChange={(event) => setQuery(event.target.value)}
+            placeholder={isLearn ? '例如：主張、反駁' : '例如：AI、公共空間'} /></span>
         </label>
         <label>分類
           <select value={category} onChange={(event) => setCategory(event.target.value)}>
@@ -45,7 +45,7 @@ export default function Catalog({ kind }: CatalogProps) {
       <section aria-label={isLearn ? '教學結果' : '辯題結果'}>
         <p className="result-count" role="status">共 {filtered.length} {isLearn ? '篇教學' : '道辯題'}</p>
         {filtered.length > 0 ? (
-          <ul className="card-grid">
+          <ul className="card-grid" role="list">
             {filtered.map((item) => <ContentCard key={item.slug} item={item} />)}
           </ul>
         ) : (
@@ -56,6 +56,6 @@ export default function Catalog({ kind }: CatalogProps) {
           </div>
         )}
       </section>
-    </>
+    </div>
   )
 }

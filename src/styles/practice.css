@@ -1,0 +1,103 @@
+.practice-preview, .practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-5);
+}
+
+.practice-preview {
+  align-items: center;
+  margin-top: var(--spacing-6);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background: linear-gradient(120deg, var(--primary-soft), var(--surface) 60%);
+}
+
+.practice-preview h2 { font-size: var(--size-section); }
+.practice-preview p { margin-block: var(--spacing-2) var(--spacing-4); color: var(--muted); }
+.practice-preview dl, .practice-preview dd { margin: 0; }
+.practice-preview dl > div { padding-block: var(--spacing-2); }
+.practice-preview dl > div + div { border-top: 1px solid var(--border); }
+.practice-preview dt { font-weight: var(--weight-bold); color: var(--primary); }
+.practice-preview dd { color: var(--muted); font-size: var(--size-small); }
+
+.practice-grid { align-items: start; }
+.coach-form, .coach-result { min-width: 0; }
+.coach-form h2, .coach-result h2 { margin-bottom: var(--spacing-4); }
+.coach-form fieldset { margin: var(--spacing-4) 0 var(--spacing-2); padding: 0; border: 0; min-width: 0; }
+.coach-form legend, .coach-field { font-weight: var(--weight-semibold); }
+.coach-form legend { padding: 0; margin-bottom: var(--spacing-1); }
+.coach-form > .coach-field { display: block; margin-block: var(--spacing-4) var(--spacing-1); }
+.coach-options { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+.coach-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-height: var(--touch-target);
+  padding-inline: var(--spacing-3);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+}
+.coach-options label:has(:checked) { border-color: var(--primary); background: var(--primary-soft); }
+.coach-options label:has(:disabled) { color: var(--muted); }
+.coach-options input { width: 1rem; min-height: auto; height: 1rem; padding: 0; margin: 0; accent-color: var(--primary); }
+.coach-hint { color: var(--muted); font-size: var(--size-small); }
+.coach-editor-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-2); }
+.coach-text-button {
+  min-height: var(--touch-target);
+  padding-inline: var(--spacing-2);
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.coach-text-button:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+.coach-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 10rem;
+  padding: var(--spacing-3);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+  background: var(--background);
+  color: var(--text);
+  resize: vertical;
+  font: inherit;
+}
+.coach-form textarea::placeholder { color: var(--muted); opacity: 1; }
+.coach-form textarea + p { margin-top: var(--spacing-1); text-align: end; }
+.coach-actions { margin-top: var(--spacing-4); }
+.coach-result { overflow-wrap: anywhere; }
+.coach-result blockquote {
+  margin: 0 0 var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-inline-start: 2px solid var(--accent);
+  background: var(--secondary-soft);
+}
+.coach-mode { color: var(--primary); font-size: var(--size-small); }
+.coach-scores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-2);
+  margin-block: var(--spacing-3);
+}
+.coach-scores > div {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--background);
+}
+.coach-scores p, .coach-scores small { font-size: var(--size-small); color: var(--muted); }
+.coach-scores strong { display: block; font-size: var(--size-lead); }
+.coach-scores meter { width: 100%; height: .65rem; }
+.coach-feedback { border-top: 1px solid var(--border); padding-top: var(--spacing-3); margin-top: var(--spacing-3); }
+.coach-feedback ul { margin-top: var(--spacing-1); }
+.coach-rewrite p { margin-top: var(--spacing-1); white-space: pre-line; }
+.coach-error { margin-top: var(--spacing-3); padding: var(--spacing-2); border-inline-start: 2px solid var(--accent); background: var(--secondary-soft); }
+
+@media (max-width: 52rem) {
+  .practice-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 42rem) {
+  .practice-preview { grid-template-columns: 1fr; }
+}

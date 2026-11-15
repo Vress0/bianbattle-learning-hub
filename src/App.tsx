@@ -5,6 +5,7 @@ import ArticleDetail from './pages/ArticleDetail'
 import Catalog from './pages/Catalog'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
+import Practice from './pages/Practice'
 import TopicDetail from './pages/TopicDetail'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="learn/:slug" element={<ArticleDetail />} />
         <Route path="topics" element={<Catalog key="topics" kind="topics" />} />
         <Route path="topics/:slug" element={<TopicDetail />} />
+        <Route path="practice" element={<Practice />} />
         <Route path="about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Route>

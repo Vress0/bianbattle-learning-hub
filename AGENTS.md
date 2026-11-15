@@ -9,27 +9,29 @@
 - **作業目標**：證明 AI 能依照這份規範重複新增內容，且新內容會自動顯示於現有網站，不需每次重新設計頁面。
 - **長期方向**：未來可作為 BianBattle 辯論平台中的「學習中心」模組；本次**獨立開發**，不得擅自修改原 BianBattle 專案。
 - **使用者**：繁體中文使用者、辯論初學者、大學生。
-- **不做的事（本次 MVP）**：登入、資料庫、付費、多人連線、真人對戰、AI 模型呼叫、AI 裁判、個資蒐集。不得擅自接入 Gemini、Supabase 或其他後端服務。
+- **原作業基礎功能**：首頁、教材、辯題及其搜尋和路由是獨立靜態網站，不依賴登入、資料庫、付費功能、模型呼叫或個資蒐集。
+- **2.0 可擴充功能**：`/practice` 提供免設定的範例模式與可選的 Gemini 教練。獨立的 Supabase Edge Function 和配額表只服務本專案，依第 15 節實作。
 
 ## 2. 技術與執行環境
 
 - 使用 **React + TypeScript + Vite** 建立單頁應用（SPA）。
 - 以 **pnpm** 管理套件與執行指令；只保留一套 lockfile（`pnpm-lock.yaml`）。
 - 使用 React Router 處理路由；所有可重用頁面必須由共同元件與內容資料渲染，而非逐頁複製 JSX。
-- 內容以專案內的 **JSON 檔案**管理；不依賴後端、外部 API 或密鑰。
+- 教材與辯題以專案內的 **JSON 檔案**管理。讀取、搜尋、分類與範例模式皆可在靜態前端運作。選用的 Gemini 模式依第 15 節配置後端。
 - 使用原生 CSS（可採 CSS Modules）及 CSS 變數管理風格；除非確有必要，不額外導入大型 UI 框架。
-- 以 **GitHub** 管理版本，優先部署到 **Vercel**。若採 BrowserRouter，專案根目錄的 `vercel.json` 必須支援直接開啟深層網址。
+- 以 **GitHub** 管理版本，公開作業版使用 **GitHub Pages**。React Router 的 `basename` 取自 Vite 的 `BASE_URL`，Pages 用 `scripts/prepare-pages.mjs` 產生入口。Vercel 的 SPA 重寫規則保留於 `vercel.json`。
 - 在 `package.json` 提供 `dev`、`build`、`preview`、`lint`、`typecheck`、`validate:content`、`test`、`check` 指令；`check` 依序執行內容驗證、型別檢查、Lint、自動化測試及正式建置。
 
 ## 3. 網站功能與路由
 
 | 路由 | 頁面 | 必要功能 |
 |---|---|---|
-| `/` | 首頁 | 專案介紹、教學／辯題入口、精選內容 |
+| `/` | 首頁 | 專案介紹、教學／辯題入口、精選內容、2.0 練習入口 |
 | `/learn` | 教學列表 | 列表卡片、關鍵字搜尋、分類篩選、空結果提示 |
 | `/learn/:slug` | 教學詳細頁 | 標題、難度、標籤、段落與示例、返回列表 |
 | `/topics` | 辯題列表 | 列表卡片、關鍵字搜尋、分類篩選、空結果提示 |
-| `/topics/:slug` | 辯題詳細頁 | 辯題背景、正反方觀點、延伸思考問題 |
+| `/topics/:slug` | 辯題詳細頁 | 辯題背景、正反方觀點、延伸思考問題、2.0 帶題練習入口 |
+| `/practice` | 2.0 論點教練 | 選題、選立場、撰寫論點、範例回饋；可用 `?topic=<slug>` 預選，Gemini 為選用模式 |
 | `/about` | 關於 | 專案用途、內容原則、未來發展方向 |
 | `*` | 404 | 易懂的錯誤提示與返回首頁入口 |
 
@@ -44,10 +46,13 @@ bianbattle-learning-hub/
 ├── package.json
 ├── pnpm-lock.yaml
 ├── index.html
-├── vercel.json               # SPA deep-link fallback
+├── vercel.json               # Vercel SPA 路由重寫
+├── .github/workflows/pages.yml # GitHub Pages 正式建置與發布
+├── .env.example              # 2.0 選用公開 Function 網址
 ├── tests/                    # 搜尋、路由及驗證 CLI 的自動化測試
 ├── scripts/
-│   └── validate-content.mjs  # JSON 結構、slug、重複資料檢查
+│   ├── validate-content.mjs  # JSON 結構、slug、重複資料檢查
+│   └── prepare-pages.mjs     # Pages 固定入口、內容入口與 404
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx
@@ -62,11 +67,13 @@ bianbattle-learning-hub/
 │   │   └── content.ts         # Article / Topic 型別及列舉
 │   └── styles/
 │       ├── tokens.css         # 色票、字級、間距、圓角
-│       └── global.css         # 全站基礎樣式
-└── public/                    # 靜態素材；不得存放私密資料
+│       ├── global.css         # 全站基礎樣式
+│       └── practice.css       # 練習頁與首頁練習入口
+├── public/                    # 吉娃娃 Logo 等靜態素材
+└── supabase/                 # 2.0 選用 Function 與配額 migration
 ```
 
-- React 元件及檔名採 `PascalCase.tsx`（例如 `ArticleCard.tsx`）；工具與型別採 `camelCase.ts`。
+- React 元件及檔名採 `PascalCase.tsx`（例如 `ContentCard.tsx`）；工具與型別採 `camelCase.ts`。
 - 內容 JSON 檔名與 `slug` 必須完全一致：英文小寫 + 數字 + 連字號（例如 `build-an-argument.json`）。
 - 不可將所有內容寫入單一 React 元件，也不可對每篇文章建立新的詳細頁元件。
 - `src/lib/content.ts` 應使用 Vite `import.meta.glob` 自動載入指定目錄的 JSON；新增檔案不必手動改索引陣列。
@@ -146,9 +153,9 @@ TypeScript 型別用於編譯期檢查；檔案驗證腳本用於保護 JSON 實
 ## 6. 介面與文字風格
 
 - 介面語言一律**繁體中文（台灣用語）**，專有名詞可保留英文。
-- 視覺風格：現代、清晰、專業、有科技感；深藍系背景搭配紫／青色重點色，避免過度花俏。
+- 沿用 BianBattle 主站的深藍、冰青與淡金。首頁以月下雲海和立論示例呈現學習入口，內頁以低彩度深色表面、細分隔線及清楚文字標題呈現教材、辯題與立場。
 - 使用 `tokens.css` 集中定義配色、間距、圓角及字級；**禁止**各頁任意寫出不同主色與卡片樣式。
-- 使用統一的文章卡片、辯題卡片、分類標籤、按鈕與頁面容器；響應式設計至少涵蓋手機（約 375px）、平板和桌面（約 1280px）。
+- 使用統一的文章卡片、辯題卡片、分類標籤、按鈕與頁面容器；響應式設計至少涵蓋手機（約 375px）、平板和桌面（約 1440px）。
 - 必須提供可讀的對比度、語意化 HTML、可辨識的鍵盤焦點、表單標籤與圖片替代文字；不要只用顏色傳達狀態。
 - 避免使用不必要的人像、未授權圖片或不明來源素材；優先使用 CSS 裝飾與清楚的排版。
 - 文案務求易懂、具體、適合初學者。涉及事實、研究、統計、法律或近期事件時，必須查證；無法查證時改以明確標示的假設案例，不可杜撰引用。
@@ -221,9 +228,10 @@ TypeScript 型別用於編譯期檢查；檔案驗證腳本用於保護 JSON 實
 2. 在 `src/pages/` 建立 `PascalCase.tsx`，於 `src/App.tsx` 共用 `Layout` 的路由群組內註冊，保留既有路徑與 404。只有全站入口需要在 `Layout.tsx` 增加 `NavLink`。
 3. 使用 `PageHeading` 提供單一主標題與摘要。教材卡片用 `ContentCard`，詳情沿用 `DetailLayout`，清單使用 `TextList`。首頁精選區的卡片用三級標題，列表頁用二級標題。
 4. 元件 Props 使用明確的 TypeScript 型別或介面。單一用途事件以 `on` 開頭，內部處理函式用 `handle` 或具體動詞。資料查找與篩選留在 `src/lib/content.ts`。
-5. 以 `tokens.css` 管理背景、表面、文字、紫色教學重點與青色辯題重點，沿用全站字型及 `global.css` 的 `.container`、`.panel`、`.button`。正反方使用明確文字標題，窄螢幕改為依序閱讀的單欄。
+5. 以 `tokens.css` 管理色階、字級與字重、間距、圓角、陰影、焦點與動效。使用繁體中文系統無襯線字型，目錄頁重用 ContentCard 並使用分隔線呈現。沿用 `global.css` 的 `.container`、`.panel`、`.button`。正反方使用明確文字標題，窄螢幕改為依序閱讀的單欄。
 6. 表單使用可辨識的標籤，動態結果數量用 `role="status"`。清除篩選後將焦點移回搜尋框。鍵盤可操作跳至主要內容、導覽、搜尋、篩選、卡片與返回連結。
-7. 檢查 375、768、1280 px 的版面、鍵盤焦點、空結果及深層路由刷新，並執行 `pnpm check`。
+7. 新增固定路由時，在 `scripts/prepare-pages.mjs` 加入對應的目錄名。新增或擴充 `tests/*.test.mjs` 內的路由測試，從該網址直接渲染，驗證可辨識的標題、主要操作，以及適用的空資料或無效參數。只新增內容時，沿用動態入口。
+8. 檢查 375、768、1440 px 的版面、鍵盤焦點、空結果及深層路由刷新。版面於 42rem 以下採單欄，精選區於 56rem 以下採雙欄。尊重 `prefers-reduced-motion`，並執行 `pnpm check`。
 
 ## 14. AI 接手與測試
 
@@ -233,3 +241,14 @@ TypeScript 型別用於編譯期檢查；檔案驗證腳本用於保護 JSON 實
 4. 行為有變動時驗證正常、空結果與失敗路徑。正式公開環境須實際開啟首頁和詳細頁，確認重新整理後渲染正確。
 5. 提交前檢查變更、機密和忽略清單。含姓名、學號的繳交稿只存本機被 Git 忽略的 `submission.local.md`。README 僅放核實過的公開連結。
 6. 若使用 GitHub Pages，保留 `BrowserRouter` 的 `BASE_URL` 與 `scripts/prepare-pages.mjs`。新增功能路由時，更新腳本中的固定入口；教材與辯題入口由 JSON 檔名產生。
+
+
+## 15. 2.0 AI 論點教練
+
+- `/practice` 從現有 JSON 選題，並接受 `?topic=<slug>` 連結。保留原作業內容與驗證規則。更新 GitHub Pages 固定入口。
+- 預設範例模式在瀏覽器本地運作，固定回饋對應所選辯題與立場的第一則示例主張。畫面須標明回饋的對象。Gemini 模式需要公開的 `VITE_COACH_ENDPOINT`，由使用者切換並送出。若失敗，顯示錯誤並保留草稿。
+- `supabase/functions/_shared/coachContract.ts` 定義輸入與回覆的執行期契約。三項分數為 0–100 整數，另含優點、問題、建議及改寫示範。客戶端與 Edge Function 都應驗證。
+- 於 Edge Function 驗證來源、輸入型別、大小及長度，使用獨立資料庫的原子配額限制模型請求，並設定請求逾時。配額表只存計數和時間窗。應用程式不儲存或記錄使用者論點。
+- Gemini 密鑰與服務角色金鑰僅供伺服器使用。前端只可配置 HTTPS Function 網址，或本機開發用的 loopback HTTP 網址。禁止連接 BianBattle 主站服務。
+- 模型評分只供學習參考。提示詞要求使用繁體中文，不得補造來源、統計或事證，未驗證資訊不得寫成既定事實。前端以文字呈現模型輸出。
+- 測試涵蓋正常輸入、空白和超長輸入、服務錯誤、配額、回覆契約與路由。沒有實際發出模型請求時，交付應明確說明。

@@ -1,7 +1,7 @@
 import { copyFile, mkdir, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const routes = ['learn', 'topics', 'about']
+const routes = ['learn', 'topics', 'about', 'practice']
 for (const [directory, route] of [['articles', 'learn'], ['topics', 'topics']]) {
   for (const filename of await readdir(join('src/content', directory))) {
     if (filename.endsWith('.json')) routes.push(join(route, filename.slice(0, -5)))

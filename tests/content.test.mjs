@@ -63,3 +63,49 @@ test('未知路徑與未知教材、辯題 slug 統一顯示 404', () => {
     assert.match(renderRoute(path), /找不到這個頁面/)
   }
 })
+
+test('首頁提供兩個主要入口及可讀的立論示例', () => {
+  const home = renderRoute('/')
+  assert.match(home, /href="\/learn"[^>]*>開始學習/)
+  assert.match(home, /href="\/topics"[^>]*>探索辯題/)
+  assert.match(home, /<figcaption>一個論點怎麼組成？<\/figcaption>/)
+})
+
+test('文章章節目錄指向可聚焦的對應段落', () => {
+  const detail = renderRoute('/learn/ask-focused-questions')
+  assert.match(detail, /<nav [^>]*aria-label="文章章節"/)
+  const links = [...detail.matchAll(/href="#(section-\d+)"/g)].map((match) => match[1])
+  const targets = [...detail.matchAll(/<section [^>]*id="(section-\d+)" tabindex="-1"/g)].map((match) => match[1])
+  assert.ok(links.length > 1)
+  assert.deepEqual(links, targets)
+  assert.equal(new Set(targets).size, targets.length)
+})
+
+test('練習頁接受辯題深層連結並提供離線範例模式', () => {
+  const detail = renderRoute('/topics/recorded-university-lectures')
+  assert.match(detail, /href="\/practice\?topic=recorded-university-lectures"/)
+  const practice = renderRoute('/practice?topic=recorded-university-lectures')
+  assert.match(practice, /<h1>AI 論點教練<\/h1>/)
+  assert.match(practice, /value="recorded-university-lectures" selected=""/)
+  assert.match(practice, /查看範例回饋/)
+  assert.doesNotMatch(renderRoute('/practice?topic=missing'), /value="missing"/)
+})
+
+test('瀏覽器 API 用戶端拒絕錯誤狀態與無效回饋', async (t) => {
+  const { requestCoachFeedback } = await server.ssrLoadModule('/src/lib/coach.ts')
+  let mockResponse = Response.json({ error: 'quota_exhausted' }, { status: 429 })
+  t.mock.method(globalThis, 'fetch', async () => mockResponse)
+  const send = () => requestCoachFeedback('https://example.test/coach', {
+    topic: '辯題', side: 'pro', argument: '論點',
+  }, new AbortController().signal)
+  await assert.rejects(send, /額度/)
+  mockResponse = Response.json({ scores: {} })
+  await assert.rejects(send, /資料格式/)
+  mockResponse = new Response('not JSON')
+  await assert.rejects(send, /資料格式/)
+  mockResponse = Response.json({
+    scores: { clarity: 80, reasoning: 60, evidence: 20 },
+    strengths: ['主張明確'], issues: ['缺少佐證'], suggestions: ['找可查證資料'], rewrite: '補上一項理由。',
+  })
+  assert.equal((await send()).scores.clarity, 80)
+})

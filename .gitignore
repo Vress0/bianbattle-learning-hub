@@ -5,3 +5,10 @@ dist/
 .DS_Store
 
 submission.local.md
+
+# Local and server-only configuration
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
